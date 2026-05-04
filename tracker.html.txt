@@ -1,0 +1,897 @@
+
+
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marrow E8 Pediatrics — 15 Day Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface2: #1a1a26;
+    --border: #2a2a3d;
+    --accent: #6c63ff;
+    --accent2: #ff6584;
+    --accent3: #43e97b;
+    --text: #e8e8f0;
+    --text-muted: #6b6b8a;
+    --done: #43e97b;
+  }
+
+- { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+background: var(–bg);
+color: var(–text);
+font-family: ‘DM Mono’, monospace;
+min-height: 100vh;
+padding: 20px;
+}
+
+/* Animated background */
+body::before {
+content: ‘’;
+position: fixed;
+top: -50%;
+left: -50%;
+width: 200%;
+height: 200%;
+background: radial-gradient(ellipse at 20% 20%, rgba(108,99,255,0.07) 0%, transparent 50%),
+radial-gradient(ellipse at 80% 80%, rgba(255,101,132,0.05) 0%, transparent 50%);
+animation: bgpulse 8s ease-in-out infinite alternate;
+pointer-events: none;
+z-index: 0;
+}
+
+@keyframes bgpulse {
+0% { transform: scale(1) rotate(0deg); }
+100% { transform: scale(1.1) rotate(3deg); }
+}
+
+.container {
+max-width: 900px;
+margin: 0 auto;
+position: relative;
+z-index: 1;
+}
+
+/* HEADER */
+.header {
+text-align: center;
+padding: 40px 0 30px;
+}
+
+.header .tag {
+display: inline-block;
+background: rgba(108,99,255,0.15);
+border: 1px solid rgba(108,99,255,0.4);
+color: var(–accent);
+font-family: ‘DM Mono’, monospace;
+font-size: 11px;
+letter-spacing: 3px;
+text-transform: uppercase;
+padding: 6px 16px;
+border-radius: 20px;
+margin-bottom: 16px;
+}
+
+.header h1 {
+font-family: ‘Syne’, sans-serif;
+font-size: clamp(28px, 5vw, 48px);
+font-weight: 800;
+letter-spacing: -1px;
+line-height: 1.1;
+background: linear-gradient(135deg, #fff 0%, #6c63ff 60%, #ff6584 100%);
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+background-clip: text;
+margin-bottom: 8px;
+}
+
+.header p {
+color: var(–text-muted);
+font-size: 13px;
+letter-spacing: 1px;
+}
+
+/* PROGRESS BAR */
+.progress-section {
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius: 16px;
+padding: 20px 24px;
+margin-bottom: 24px;
+display: flex;
+align-items: center;
+gap: 20px;
+flex-wrap: wrap;
+}
+
+.progress-stats {
+display: flex;
+gap: 24px;
+flex-wrap: wrap;
+}
+
+.stat {
+text-align: center;
+}
+
+.stat-num {
+font-family: ‘Syne’, sans-serif;
+font-size: 28px;
+font-weight: 800;
+color: var(–accent);
+line-height: 1;
+}
+
+.stat-num.done-stat { color: var(–done); }
+.stat-num.day-stat { color: var(–accent2); }
+
+.stat-label {
+font-size: 10px;
+color: var(–text-muted);
+letter-spacing: 2px;
+text-transform: uppercase;
+margin-top: 4px;
+}
+
+.progress-bar-wrap {
+flex: 1;
+min-width: 200px;
+}
+
+.progress-bar-label {
+display: flex;
+justify-content: space-between;
+font-size: 11px;
+color: var(–text-muted);
+margin-bottom: 8px;
+}
+
+.progress-bar-bg {
+background: var(–border);
+border-radius: 999px;
+height: 8px;
+overflow: hidden;
+}
+
+.progress-bar-fill {
+height: 100%;
+border-radius: 999px;
+background: linear-gradient(90deg, var(–accent), var(–accent2));
+transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+width: 0%;
+}
+
+/* RESET BUTTON */
+.reset-btn {
+background: rgba(255,101,132,0.1);
+border: 1px solid rgba(255,101,132,0.3);
+color: var(–accent2);
+font-family: ‘DM Mono’, monospace;
+font-size: 11px;
+letter-spacing: 1px;
+padding: 8px 16px;
+border-radius: 8px;
+cursor: pointer;
+transition: all 0.2s;
+}
+
+.reset-btn:hover {
+background: rgba(255,101,132,0.2);
+border-color: var(–accent2);
+}
+
+/* DAY CARDS */
+.day-card {
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius: 16px;
+margin-bottom: 16px;
+overflow: hidden;
+transition: border-color 0.3s;
+}
+
+.day-card.all-done {
+border-color: rgba(67,233,123,0.4);
+background: linear-gradient(135deg, var(–surface) 0%, rgba(67,233,123,0.03) 100%);
+}
+
+.day-header {
+display: flex;
+align-items: center;
+padding: 16px 20px;
+cursor: pointer;
+user-select: none;
+gap: 16px;
+transition: background 0.2s;
+}
+
+.day-header:hover { background: var(–surface2); }
+
+.day-number {
+font-family: ‘Syne’, sans-serif;
+font-size: 11px;
+font-weight: 700;
+letter-spacing: 3px;
+text-transform: uppercase;
+color: var(–text-muted);
+min-width: 60px;
+}
+
+.day-title {
+font-family: ‘Syne’, sans-serif;
+font-size: 15px;
+font-weight: 700;
+color: var(–text);
+flex: 1;
+}
+
+.day-meta {
+display: flex;
+gap: 12px;
+align-items: center;
+flex-wrap: wrap;
+}
+
+.day-hours {
+font-size: 11px;
+color: var(–accent);
+background: rgba(108,99,255,0.1);
+border: 1px solid rgba(108,99,255,0.25);
+padding: 3px 10px;
+border-radius: 20px;
+white-space: nowrap;
+}
+
+.day-progress-mini {
+font-size: 11px;
+color: var(–text-muted);
+white-space: nowrap;
+}
+
+.day-progress-mini.complete {
+color: var(–done);
+}
+
+.day-check-all {
+width: 28px;
+height: 28px;
+border-radius: 8px;
+border: 2px solid var(–border);
+background: transparent;
+cursor: pointer;
+display: flex;
+align-items: center;
+justify-content: center;
+transition: all 0.2s;
+flex-shrink: 0;
+font-size: 14px;
+}
+
+.day-check-all:hover {
+border-color: var(–done);
+background: rgba(67,233,123,0.1);
+}
+
+.day-check-all.checked {
+background: var(–done);
+border-color: var(–done);
+color: #0a0a0f;
+}
+
+.chevron {
+color: var(–text-muted);
+font-size: 12px;
+transition: transform 0.3s;
+flex-shrink: 0;
+}
+
+.day-card.open .chevron { transform: rotate(180deg); }
+
+/* VIDEO LIST */
+.video-list {
+display: none;
+padding: 0 20px 16px;
+border-top: 1px solid var(–border);
+}
+
+.day-card.open .video-list { display: block; }
+
+.section-label {
+font-size: 10px;
+letter-spacing: 3px;
+text-transform: uppercase;
+color: var(–text-muted);
+padding: 14px 0 8px;
+border-bottom: 1px solid var(–border);
+margin-bottom: 8px;
+}
+
+.video-item {
+display: flex;
+align-items: center;
+gap: 12px;
+padding: 10px 0;
+border-bottom: 1px solid rgba(42,42,61,0.5);
+cursor: pointer;
+transition: all 0.2s;
+border-radius: 4px;
+}
+
+.video-item:last-child { border-bottom: none; }
+.video-item:hover { padding-left: 6px; }
+
+.video-checkbox {
+width: 22px;
+height: 22px;
+border-radius: 6px;
+border: 2px solid var(–border);
+background: transparent;
+display: flex;
+align-items: center;
+justify-content: center;
+flex-shrink: 0;
+transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+font-size: 12px;
+}
+
+.video-item.checked .video-checkbox {
+background: var(–done);
+border-color: var(–done);
+color: #0a0a0f;
+transform: scale(1.1);
+}
+
+.video-info { flex: 1; }
+
+.video-name {
+font-size: 13px;
+color: var(–text);
+transition: color 0.2s;
+line-height: 1.4;
+}
+
+.video-item.checked .video-name {
+color: var(–text-muted);
+text-decoration: line-through;
+text-decoration-color: rgba(107,107,138,0.5);
+}
+
+.video-tags {
+display: flex;
+gap: 6px;
+margin-top: 4px;
+flex-wrap: wrap;
+}
+
+.video-duration {
+font-size: 10px;
+color: var(–text-muted);
+letter-spacing: 1px;
+}
+
+.video-tag {
+font-size: 9px;
+letter-spacing: 1px;
+text-transform: uppercase;
+padding: 2px 7px;
+border-radius: 4px;
+}
+
+.tag-heavy {
+background: rgba(255,101,132,0.12);
+color: var(–accent2);
+border: 1px solid rgba(255,101,132,0.25);
+}
+
+.tag-high {
+background: rgba(255,193,7,0.1);
+color: #ffc107;
+border: 1px solid rgba(255,193,7,0.25);
+}
+
+.tag-qbank {
+background: rgba(108,99,255,0.12);
+color: var(–accent);
+border: 1px solid rgba(108,99,255,0.25);
+}
+
+/* CONFETTI */
+.confetti-piece {
+position: fixed;
+width: 8px;
+height: 8px;
+top: -10px;
+border-radius: 2px;
+animation: confetti-fall linear forwards;
+pointer-events: none;
+z-index: 999;
+}
+
+@keyframes confetti-fall {
+0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+/* COMPLETION BANNER */
+.completion-banner {
+display: none;
+text-align: center;
+padding: 30px;
+background: linear-gradient(135deg, rgba(67,233,123,0.1), rgba(108,99,255,0.1));
+border: 1px solid rgba(67,233,123,0.3);
+border-radius: 16px;
+margin-bottom: 24px;
+animation: fadeIn 0.5s ease;
+}
+
+.completion-banner.show { display: block; }
+
+@keyframes fadeIn {
+from { opacity: 0; transform: translateY(-10px); }
+to { opacity: 1; transform: translateY(0); }
+}
+
+.completion-banner h2 {
+font-family: ‘Syne’, sans-serif;
+font-size: 24px;
+font-weight: 800;
+color: var(–done);
+margin-bottom: 8px;
+}
+
+.completion-banner p {
+color: var(–text-muted);
+font-size: 13px;
+}
+
+/* STREAK */
+.streak-bar {
+display: flex;
+gap: 6px;
+margin-bottom: 24px;
+flex-wrap: wrap;
+}
+
+.streak-day {
+flex: 1;
+min-width: 40px;
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius: 8px;
+padding: 8px 4px;
+text-align: center;
+transition: all 0.3s;
+}
+
+.streak-day.complete {
+background: rgba(67,233,123,0.1);
+border-color: rgba(67,233,123,0.4);
+}
+
+.streak-day-num {
+font-family: ‘Syne’, sans-serif;
+font-size: 13px;
+font-weight: 700;
+color: var(–text-muted);
+}
+
+.streak-day.complete .streak-day-num { color: var(–done); }
+
+.streak-dot {
+width: 6px;
+height: 6px;
+border-radius: 50%;
+background: var(–border);
+margin: 4px auto 0;
+transition: background 0.3s;
+}
+
+.streak-day.complete .streak-dot { background: var(–done); }
+
+@media (max-width: 600px) {
+body { padding: 12px; }
+.day-title { font-size: 13px; }
+.progress-section { flex-direction: column; }
+.progress-stats { justify-content: center; }
+}
+</style>
+
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="tag">Marrow Edition 8</div>
+    <h1>Paediatrics<br>15-Day Plan</h1>
+    <p>Dr. Singaram · 54 Videos Remaining · Track your progress</p>
+  </div>
+
+  <div id="completionBanner" class="completion-banner">
+    <h2>🎉 PAEDIATRICS DONE!</h2>
+    <p>You've completed all 54 videos. Time to crush the QBank. NEET PG 2028 — you're ready.</p>
+  </div>
+
+  <!-- PROGRESS -->
+
+  <div class="progress-section">
+    <div class="progress-stats">
+      <div class="stat">
+        <div class="stat-num done-stat" id="doneCount">0</div>
+        <div class="stat-label">Done</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num" id="totalCount">54</div>
+        <div class="stat-label">Total</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num day-stat" id="daysLeft">15</div>
+        <div class="stat-label">Days</div>
+      </div>
+    </div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-label">
+        <span>Progress</span>
+        <span id="progressPct">0%</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progressFill"></div>
+      </div>
+    </div>
+    <button class="reset-btn" onclick="resetAll()">↺ Reset</button>
+  </div>
+
+  <!-- STREAK -->
+
+  <div class="streak-bar" id="streakBar"></div>
+
+  <!-- DAYS -->
+
+  <div id="daysContainer"></div>
+
+</div>
+
+<script>
+const DAYS = [
+  {
+    day: 1,
+    title: "Neonatology Part 1",
+    hours: "~4 hrs",
+    videos: [
+      { id: "v2", name: "V2 · Normal Newborn", dur: "72 min", tags: ["heavy"] },
+      { id: "v3", name: "V3 · Neonatal Resuscitation", dur: "60 min", tags: ["high"] },
+      { id: "v4", name: "V4 · NEC & Neonatal Sepsis", dur: "45 min", tags: [] },
+      { id: "q1", name: "QBank · Neonatology Part 1", dur: "~60 min", tags: ["qbank"] }
+    ]
+  },
+  {
+    day: 2,
+    title: "Neonatology Part 2",
+    hours: "~4.5 hrs",
+    videos: [
+      { id: "v5", name: "V5 · Respiratory Distress in Newborn", dur: "55 min", tags: ["high"] },
+      { id: "v6", name: "V6 · Neonatal Jaundice", dur: "60 min", tags: ["high"] },
+      { id: "v7", name: "V7 · Neonatal Hypothermia & Hypoglycemia", dur: "41 min", tags: [] },
+      { id: "v8", name: "V8 · Neonatal Reflexes, HIE & Seizures", dur: "56 min", tags: ["heavy"] },
+      { id: "q2", name: "QBank · Complete Neonatology", dur: "~60 min", tags: ["qbank"] }
+    ]
+  },
+  {
+    day: 3,
+    title: "Growth & Development",
+    hours: "~5 hrs",
+    videos: [
+      { id: "v9", name: "V9 · Normal Growth", dur: "55 min", tags: [] },
+      { id: "v10", name: "V10 · Abnormalities of Head Size & Shape", dur: "37 min", tags: [] },
+      { id: "v11", name: "V11 · Abnormalities of Stature", dur: "27 min", tags: [] },
+      { id: "v12", name: "V12 · Normal Development", dur: "53 min", tags: ["high"] },
+      { id: "v13", name: "V13 · Disorders of Development", dur: "75 min", tags: ["heavy"] },
+      { id: "q3", name: "QBank · Growth & Development", dur: "~60 min", tags: ["qbank"] }
+    ]
+  },
+  {
+    day: 4,
+    title: "Behavioural + Nutrition",
+    hours: "~4 hrs",
+    videos: [
+      { id: "v14", name: "V14 · Behavioural Disorders in Children", dur: "37 min", tags: [] },
+      { id: "v15", name: "V15 · Breastfeeding", dur: "34 min", tags: [] },
+      { id: "v16", name: "V16 · Malnutrition", dur: "45 min", tags: ["high"] },
+      { id: "v17", name: "V17 · Obesity", dur: "28 min", tags: [] },
+      { id: "v18", name: "V18 · Rickets & Scurvy", dur: "43 min", tags: ["high"] },
+      { id: "q4", name: "QBank · Nutrition", dur: "~60 min", tags: ["qbank"] }
+    ]
+  },
+  {
+    day: 5,
+    title: "Genetics + Childhood Infections",
+    hours: "~4.5 hrs",
+    videos: [
+      { id: "v19", name: "V19 · Genetic Disorders", dur: "63 min", tags: [] },
+      { id: "v20", name: "V20 · Childhood Infections", dur: "58 min", tags: ["high"] },
+      { id: "v21", name: "V21 · TORCH Infections", dur: "45 min", tags: ["high"] },
+      { id: "v22", name: "V22 · COVID-19 in Children", dur: "28 min", tags: [] },
+      { id: "q5", name: "QBank · Genetics + Infections", dur: "~60 min", tags: ["qbank"] }
+    ]
+  },
+  {
+    day: 6,
+    title: "GI System",
+    hours: "~4 hrs",
+    videos: [
+      { id: "v23", name: "V23 · Disorders of Esophagus in Children", dur: "25 min", tags: [] },
+      { id: "v24", name: "V24 · Diarrheal Disorders in Children", dur: "45 min", tags: ["high"] },
+      { id: "v25", name: "V25 · Disorders of Liver in Children", dur: "72 min", tags: ["heavy"] },
+      { id: "v26", name: "V26 · Surgical GI Disorders in Children", dur: "43 min", tags: [] },
+      { id: "q6", name: "QBank · GI System", dur: "~60 min", tags: ["qbank"] }
+    ]
+  },
+  {
+    day: 7,
+    title: "Respiratory System",
+    hours: "~4 hrs",
+    videos: [
+      { id: "v27", name: "V27 · Airway Malformations & Foreign Bodies", dur: "34 min", tags: [] },
+      { id: "v28", name: "V28 · Asthma", dur: "36 min", tags: ["high"] },
+      { id: "v29", name: "V29 · Respiratory Infections", dur: "43 min", tags: ["high"] },
+      { id: "v30", name: "V30 · Cystic Fibrosis", dur: "28 min", tags: [] },
+      { id: "q7", name: "QBank · Respiratory System", dur: "~90 min", tags: ["qbank"] }
+    ]
+  },
+  {
+    day: 8,
+    title: "Cardiovascular System ⚠️",
+    hours: "~5 hrs",
+    videos: [
+      { id: "v31", name: "V31 · Fetal Circulation & Intro to CHD", dur: "28 min", tags: [] },
+      { id: "v32", name: "V32 · Acyanotic Congenital Heart Defects", dur: "48 min", tags: ["heavy"] },
+      { id: "v33", name: "V33 · Cyanotic Congenital Heart Defects", dur: "62 min", tags: ["heavy"] },
+      { id: "v34", name: "V34 · Acute Rheumatic Fever", dur: "28 min", tags: ["high"] },
+      { id: "q8", name: "QBank · Cardiology (2 hrs — don't skip)", dur: "~120 min", tags: ["qbank"] }
+    ]
+  },
+  {
+    day: 9,
+    title: "Genitourinary System",
+    hours: "~4.5 hrs",
+    videos: [
+      { id: "v35", name: "V35 · Congenital Anomalies of Kidney & Urinary Tract", dur: "38 min", tags: [] },
+      { id: "v36", name: "V36 · Nephrotic & Nephritic Syndrome", dur: "49 min", tags: ["high"] },
+      { id: "v37", name: "V37 · Inherited Tubular Disorders", dur: "32 min", tags: [] },
+      { id: "v38", name: "V38 · AKI & Chronic Kidney Disease", dur: "44 min", tags: [] },
+      { id: "v39", name: "V39 · VUR & UTI Management Guidelines", dur: "36 min", tags: ["high"] },
+      { id: "q9", name: "QBank · Renal System", dur: "~60 min", tags: ["qbank"] }
+    ]
+  },
+  {
+    day: 10,
+    title: "Nervous System Part 1",
+    hours: "~4 hrs",
+    videos: [
+      { id: "v40", name: "V40 · Congenital Anomalies & Hydrocephalus", dur: "32 min", tags: [] },
+      { id: "v41", name: "V41 · Seizure Disorders", dur: "48 min", tags: ["heavy"] },
+      { id: "v42", name: "V42 · Cerebral Palsy & CNS Infections", dur: "78 min", tags: ["heavy"] },
+      { id: "q10", name: "QBank · Neuro Part 1", dur: "~90 min", tags: ["qbank"] }
+    ]
+  },
+  {
+    day: 11,
+    title: "Nervous System Part 2 + Endocrine",
+    hours: "~4.5 hrs",
+    videos: [
+      { id: "v43", name: "V43 · Neuromuscular Disorders", dur: "47 min", tags: [] },
+      { id: "v44", name: "V44 · Iodine Deficiency & Hypothyroidism", dur: "44 min", tags: ["high"] },
+      { id: "v45", name: "V45 · Glucose Disorders in Children", dur: "52 min", tags: ["high"] },
+      { id: "v46", name: "V46 · Adrenal Disorders", dur: "35 min", tags: [] },
+      { id: "v47", name: "V47 · Diabetes Insipidus", dur: "32 min", tags: [] },
+      { id: "q11", name: "QBank · Neuro + Endocrine", dur: "~60 min", tags: ["qbank"] }
+    ]
+  },
+  {
+    day: 12,
+    title: "Malignancies + Rheumatology",
+    hours: "~4.5 hrs",
+    videos: [
+      { id: "v48", name: "V48 · Haematological Malignancies", dur: "71 min", tags: ["heavy"] },
+      { id: "v49", name: "V49 · Solid Tumours in Children", dur: "33 min", tags: [] },
+      { id: "v50", name: "V50 · Rheumatic Diseases of Childhood", dur: "73 min", tags: ["heavy"] },
+      { id: "q12", name: "QBank · Malignancies + Rheumatology", dur: "~90 min", tags: ["qbank"] }
+    ]
+  },
+  {
+    day: 13,
+    title: "Haematology",
+    hours: "~4.5 hrs",
+    videos: [
+      { id: "v51", name: "V51 · Approach to Anaemia & Nutritional Anaemia", dur: "62 min", tags: ["high"] },
+      { id: "v52", name: "V52 · Congenital Haemolytic Anaemia", dur: "65 min", tags: [] },
+      { id: "v53", name: "V53 · Bleeding Disorders", dur: "42 min", tags: [] },
+      { id: "q13", name: "QBank · Haematology", dur: "~90 min", tags: ["qbank"] }
+    ]
+  },
+  {
+    day: 14,
+    title: "Miscellaneous + Vaccines",
+    hours: "~5 hrs",
+    videos: [
+      { id: "v54", name: "V54 · Paediatric Resuscitation", dur: "34 min", tags: [] },
+      { id: "v55", name: "V55 · Shock", dur: "47 min", tags: ["high"] },
+      { id: "q14a", name: "QBank · Vaccines (revise from notes)", dur: "~60 min", tags: ["qbank"] },
+      { id: "q14b", name: "QBank · Remaining weak topics", dur: "~90 min", tags: ["qbank"] }
+    ]
+  },
+  {
+    day: 15,
+    title: "Full Revision Day 🏁",
+    hours: "~5 hrs",
+    videos: [
+      { id: "r1", name: "Delta MCQ Discussion Videos — weak topics", dur: "~120 min", tags: ["qbank"] },
+      { id: "r2", name: "Custom QBank — flagged questions only", dur: "~120 min", tags: ["qbank"] },
+      { id: "r3", name: "Quick notes scan — all sections", dur: "~60 min", tags: [] }
+    ]
+  }
+];
+
+const TOTAL = DAYS.reduce((a, d) => a + d.videos.length, 0);
+let state = {};
+
+function loadState() {
+  const saved = localStorage.getItem('marrow_pedia_state');
+  state = saved ? JSON.parse(saved) : {};
+}
+
+function saveState() {
+  localStorage.setItem('marrow_pedia_state', JSON.stringify(state));
+}
+
+function resetAll() {
+  if (!confirm('Reset all progress? This cannot be undone.')) return;
+  state = {};
+  saveState();
+  renderAll();
+}
+
+function toggleVideo(id) {
+  state[id] = !state[id];
+  saveState();
+  renderAll();
+  if (state[id]) spawnConfetti(3);
+}
+
+function toggleDay(dayIdx) {
+  const day = DAYS[dayIdx];
+  const allDone = day.videos.every(v => state[v.id]);
+  day.videos.forEach(v => { state[v.id] = !allDone; });
+  saveState();
+  renderAll();
+  if (!allDone) spawnConfetti(12);
+}
+
+function spawnConfetti(count) {
+  const colors = ['#6c63ff','#ff6584','#43e97b','#ffc107','#00d4ff'];
+  for (let i = 0; i < count; i++) {
+    setTimeout(() => {
+      const el = document.createElement('div');
+      el.className = 'confetti-piece';
+      el.style.left = Math.random() * 100 + 'vw';
+      el.style.background = colors[Math.floor(Math.random() * colors.length)];
+      el.style.animationDuration = (1.5 + Math.random() * 2) + 's';
+      el.style.animationDelay = Math.random() * 0.3 + 's';
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 4000);
+    }, i * 80);
+  }
+}
+
+function getDoneCount() {
+  return Object.values(state).filter(Boolean).length;
+}
+
+function renderStreak() {
+  const bar = document.getElementById('streakBar');
+  bar.innerHTML = DAYS.map((d, i) => {
+    const allDone = d.videos.every(v => state[v.id]);
+    return `<div class="streak-day ${allDone ? 'complete' : ''}">
+      <div class="streak-day-num">${d.day}</div>
+      <div class="streak-dot"></div>
+    </div>`;
+  }).join('');
+}
+
+function renderProgress() {
+  const done = getDoneCount();
+  const pct = Math.round((done / TOTAL) * 100);
+  document.getElementById('doneCount').textContent = done;
+  document.getElementById('totalCount').textContent = TOTAL;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressPct').textContent = pct + '%';
+
+  const daysComplete = DAYS.filter(d => d.videos.every(v => state[v.id])).length;
+  document.getElementById('daysLeft').textContent = 15 - daysComplete;
+
+  const banner = document.getElementById('completionBanner');
+  if (done === TOTAL) {
+    banner.classList.add('show');
+    spawnConfetti(30);
+  } else {
+    banner.classList.remove('show');
+  }
+}
+
+function renderDays() {
+  const container = document.getElementById('daysContainer');
+  const openDays = JSON.parse(localStorage.getItem('marrow_open_days') || '{"0":true}');
+
+  container.innerHTML = DAYS.map((day, idx) => {
+    const allDone = day.videos.every(v => state[v.id]);
+    const doneCnt = day.videos.filter(v => state[v.id]).length;
+    const isOpen = openDays[idx] !== false;
+
+    const videoItems = day.videos.map(v => {
+      const checked = !!state[v.id];
+      const tagHtml = v.tags.map(t => {
+        if (t === 'heavy') return `<span class="video-tag tag-heavy">heavy</span>`;
+        if (t === 'high') return `<span class="video-tag tag-high">high yield</span>`;
+        if (t === 'qbank') return `<span class="video-tag tag-qbank">qbank</span>`;
+        return '';
+      }).join('');
+
+      return `<div class="video-item ${checked ? 'checked' : ''}" onclick="toggleVideo('${v.id}'); event.stopPropagation()">
+        <div class="video-checkbox">${checked ? '✓' : ''}</div>
+        <div class="video-info">
+          <div class="video-name">${v.name}</div>
+          <div class="video-tags">
+            <span class="video-duration">${v.dur}</span>
+            ${tagHtml}
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+
+    return `<div class="day-card ${allDone ? 'all-done' : ''} ${isOpen ? 'open' : ''}" id="day-card-${idx}">
+      <div class="day-header" onclick="toggleDayOpen(${idx})">
+        <span class="day-number">Day ${day.day}</span>
+        <span class="day-title">${day.title}</span>
+        <div class="day-meta">
+          <span class="day-hours">${day.hours}</span>
+          <span class="day-progress-mini ${allDone ? 'complete' : ''}">${doneCnt}/${day.videos.length} ${allDone ? '✓' : ''}</span>
+        </div>
+        <div class="day-check-all ${allDone ? 'checked' : ''}" onclick="toggleDay(${idx}); event.stopPropagation()" title="Mark all done">
+          ${allDone ? '✓' : ''}
+        </div>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="video-list">
+        <div class="section-label">Videos + Tasks</div>
+        ${videoItems}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleDayOpen(idx) {
+  const openDays = JSON.parse(localStorage.getItem('marrow_open_days') || '{"0":true}');
+  openDays[idx] = !openDays[idx];
+  localStorage.setItem('marrow_open_days', JSON.stringify(openDays));
+  renderAll();
+}
+
+function renderAll() {
+  renderProgress();
+  renderStreak();
+  renderDays();
+}
+
+loadState();
+renderAll();
+</script>
+
+</body>
+</html>
